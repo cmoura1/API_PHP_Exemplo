@@ -1,11 +1,13 @@
 <?php
 include_once "./config/config.php";
+include_once "./config/jwt.php";
 
 require_once "./app/service/DAO.php";
 require_once "./app/models/usuario.php";
 require_once "./app/controller/usuarioController.php";
 
 //phpinfo();
+
 try {
     if (count($_REQUEST) == 0) throw new Exception();
 
