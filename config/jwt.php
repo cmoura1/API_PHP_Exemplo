@@ -1,33 +1,60 @@
 <?php
-//Application Key
-$key = '';
 
-//Header Token
-$header = [
-    'typ' => 'JWT',
-    'alg' => 'HS256'
-];
+function generateJWT($dados)
+{
+    //Application Key
+    $key = KEY; // loja - exemplo
 
-//Payload - Content
-$payload = [
-    'exp' => (new DateTime("now"))->getTimestamp(),
-    'uid' => 1,
-    'email' => 'email@email.com',
-];
+    //Header Token
+    $header = [
+        'typ' => 'JWT',
+        'alg' => 'HS256'
+    ];
 
-//JSON
-$header = json_encode($header);
-$payload = json_encode($payload);
+    //Payload - Content
+    $payload = [
+        'exp' => (new DateTime("now"))->getTimestamp(), //tempo em segundos a partir de 1/1/1970
+        'uid' => $dados->id,
+        'email' => $dados->email,
+        'name' => $dados->nome,
+    ];
 
-//Base 64
-$header = base64_encode($header);
-$payload = base64_encode($payload);
+    //JSON
+    $header = json_encode($header);
+    $payload = json_encode($payload);
 
-//Sign
-$sign = hash_hmac('sha256', $header . "." . $payload, $key, true);
-$sign = base64_encode($sign);
+    //Base 64
+    $header = base64_encode($header);
+    $payload = base64_encode($payload);
 
-//Token
-$token = $header . '.' . $payload . '.' . $sign;
+    //Sign
+    $sign = hash_hmac('sha256', $header . "." . $payload, $key, true);
+    $sign = base64_encode($sign);
 
-print $token;
+    //Token
+    $token = $header . '.' . $payload . '.' . $sign;
+
+    return $token;
+}
+
+function validJWT($token)
+{
+    $key = KEY;
+
+    $token =  str_replace(["Bearer", " "], "", $token);
+
+    $partes = explode(".", $token);
+
+    $header = $partes[0];
+    $payload = $partes[1];
+    $sign = $partes[2];
+
+    $signVerfi = base64_encode(hash_hmac('sha256', $header . "." . $payload, $key, true));
+
+    if ($sign === $signVerfi) {
+        //$header = json_encode(base64_decode($header));
+        $payload = json_encode(base64_decode($payload));
+        return $payload;
+    }
+    return false;
+}
