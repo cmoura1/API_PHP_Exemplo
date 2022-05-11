@@ -38,7 +38,6 @@ try {
         array_shift($url);
 
         $auth = authentic($method, $url);
-        //$auth = "userAll";
 
         //Verifica validação do usuario
         if ($auth != null && $url[count($url) - 1] == "logon") {
